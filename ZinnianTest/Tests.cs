@@ -29,75 +29,82 @@ namespace ZinnianTest
 				.StartApp();
 		}
 
-		[Test]
-		public void TestRegister()
+//		[Test]
+		public void TestFeed()
 		{
 			try
 			{
-
-				var random = (new Random()).Next();
-				Console.Out.WriteLine("Key : " + random);
+				var randomArtist = (new Random()).Next();
+				Console.Out.WriteLine("Key : " + randomArtist);
 
 				var model = new Model();
 
-				app.Tap(model.RegisterButton);
+				//				LoginAsUser("b@b.com", "b");
+				app.Tap(c => c.Marked("el_btn_email_login"));
 
-				app.WaitForElement(model.RegisterName);
+				app.Tap(c => c.Marked("el_input_email"));
+				app.EnterText("b@b.com");
 
-				var email = "Artist" + random + "@email.com";
-
-				app.Tap(model.RegisterEmail);
-				app.EnterText(email);
-
-				app.Tap(model.RegisterName);
-				app.EnterText("Artist Name " + random);
-
-				app.Tap(model.RegisterPassword);
-				app.EnterText("123456");
-
-				app.Tap(model.RegisterPasswordConfirmation);
-				app.EnterText("123456");
+				app.Tap(c => c.Marked("el_input_password"));
+				app.EnterText("b");
 
 				app.PressEnter();
 
-				app.Tap(model.RegisterRegisterButton);
+				app.Tap(c => c.Marked("el_btn_email_login"));
 
-				app.WaitForElement(model.PhoneVerificationNumber);
+				app.WaitForElement(c => c.Marked("follow_artist_list"));
 
-				app.Tap(model.PhoneVerificationNumber);
-				app.EnterText(random.ToString());
+				var name = "Miss Destiny Rogahn";
+				QQ qq = model.FollowArtistButton(name);
+				app.Tap(qq);
 
-				app.PressEnter();
+				this.all();
+			}
+			catch
+			{
+				this.all();
 
-				app.Tap(model.PhoneVerificationButton);
+				throw;
+			}
+		}
 
-				app.WaitForElement(model.PhoneNumberConfirmationSend);
+		[Test]
+		public void TestFullScenario()
+		{
+			try
+			{
+				var randomArtist = (new Random()).Next();
+				Console.Out.WriteLine("Key : " + randomArtist);
 
-				app.Tap(model.PhoneNumberConfirmationSend);
-
-				app.WaitForElement(model.ToastMessage);
-
-				var code = app.Query(model.ToastMessage).First().Text;
-
-				Console.Out.WriteLine(code);
-
-				code = code.Replace("Code: ", "");
-
-				app.Tap(model.PhoneVerificationCodeNumber);
-				app.EnterText(code);
-
-				app.Tap(model.PhoneVerificationCodeButton);
-
-				app.Tap(model.PhoneNumberConfirmationSend);
-
-				app.Tap(model.FollowArtistButton);
-
-				app.Tap(model.FollowDoneButton);
+				var model = new Model();
+				string email = RegisterUser(randomArtist, model);
 
 				var wc = new System.Net.WebClient();
 				var output = wc.DownloadString("http://zapi.klsandbox.com/data/set-as-artist/" + email);
 
 				Console.WriteLine(output);
+
+				var randomUser = (new Random()).Next();
+				var userEmail = RegisterUser(randomUser, model, getArtistName(randomArtist));
+			}
+			catch
+			{
+				this.all();
+
+				throw;
+			}
+		}
+
+//		[Test]
+		public void TestRegister()
+		{
+			try
+			{
+				var randomArtist = (new Random()).Next();
+				Console.Out.WriteLine("Key : " + randomArtist);
+
+				var model = new Model();
+				string email = RegisterUser(randomArtist, model);
 			}
 			catch
 			{
@@ -164,6 +171,96 @@ namespace ZinnianTest
 			app.Tap(c => c.Marked("follow_button_follow").Index(0));
 
 			app.Tap(c => c.Marked("follow_btn_done"));
+		}
+
+		string getArtistName(int random)
+		{
+			return "Artist Name " + random;
+		}
+
+		string RegisterUser(int random, Model model, string followUserName = null)
+		{
+			app.Tap(model.RegisterButton);
+
+			app.WaitForElement(model.RegisterName);
+
+			var email = "Artist" + random + "@email.com";
+
+			app.Tap(model.RegisterEmail);
+			app.EnterText(email);
+
+			app.Tap(model.RegisterName);
+			app.EnterText(getArtistName(random));
+
+			app.Tap(model.RegisterPassword);
+			app.EnterText("123456");
+
+			app.Tap(model.RegisterPasswordConfirmation);
+			app.EnterText("123456");
+
+			app.PressEnter();
+
+			app.Tap(model.RegisterRegisterButton);
+
+			app.WaitForElement(model.PhoneVerificationNumberOne);
+
+			app.Tap(model.PhoneVerificationNumberOne);
+			app.EnterText("011");
+
+			var fourDigit = String.Format("{0:0000}", random % 10000);
+
+			app.Tap(model.PhoneVerificationNumberTwo);
+			app.EnterText("1111");
+
+			app.Tap(model.PhoneVerificationNumberThree);
+			app.EnterText(fourDigit);
+
+			app.PressEnter();
+
+			app.Tap(model.PhoneVerificationButton);
+
+			app.WaitForElement(model.PhoneNumberConfirmationSend);
+
+			app.Tap(model.PhoneNumberConfirmationSend);
+
+//			app.WaitForElement(model.ToastMessage);
+
+//			var code = app.Query(model.ToastMessage).First().Text;
+
+//			Console.Out.WriteLine(code);
+
+//			code = code.Replace("Code: ", "");
+
+			app.Tap(model.PhoneVerificationCodeNumber);
+
+			// app.EnterText(code);
+			app.EnterText("0000");
+
+			app.Tap(model.PhoneVerificationCodeButton);
+
+			app.Tap(model.PhoneNumberConfirmationSend);
+
+			if (followUserName == null)
+			{
+				app.Tap(model.FirstFollowArtistButton);
+			}
+			else
+			{
+				app.ScrollDownTo(model.FollowArtistButton(followUserName));
+				app.Tap(model.FollowArtistButton(followUserName));
+			}
+
+			app.Tap(model.FollowDoneButton);
+
+			app.Tap(model.SideMenuHamburger);
+
+			app.Tap(model.SideMenuSetting);
+
+			app.ScrollToVerticalEnd();
+
+			app.Tap(model.SettingsLogout);
+
+			return email;
 		}
 	}
 }

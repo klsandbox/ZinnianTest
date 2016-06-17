@@ -81,6 +81,30 @@ namespace ZinnianTest
 			}
 		}
 
+		public QQ PhoneVerificationNumberOne
+		{
+			get
+			{
+				return marked("pv_input_editTxt1");
+			}
+		}
+		public QQ PhoneVerificationNumberTwo
+		{
+			get
+			{
+				return marked("pv_input_editTxt2");
+			}
+		}
+
+		public QQ PhoneVerificationNumberThree
+		{
+			get
+			{
+				return marked("pv_input_editTxt3");
+			}
+		}
+
+
 		public QQ PhoneVerificationButton
 		{
 			get
@@ -93,14 +117,14 @@ namespace ZinnianTest
 		{
 			get
 			{
-				return this.PhoneVerificationNumber;
+				return marked("pv2_input_code");
 			}
 		}
 		public QQ PhoneVerificationCodeButton
 		{
 			get
 			{
-				return this.PhoneVerificationButton;
+				return marked("pv2_btn_complete");
 			}
 		}
 
@@ -121,7 +145,7 @@ namespace ZinnianTest
 			}
 		}
 
-		public QQ FollowArtistButton
+		public QQ FirstFollowArtistButton
 		{
 			get
 			{
@@ -135,6 +159,35 @@ namespace ZinnianTest
 			{
 				return marked("follow_btn_done");
 			}
+		}
+
+		public QQ SideMenuHamburger
+		{
+			get
+			{
+				return marked("hamburger");
+			}
+		}
+
+		public QQ SideMenuSetting
+		{
+			get
+			{
+				return q => q.Marked("design_menu_item_text").Text("Settings");
+			}
+		}
+
+		public QQ SettingsLogout
+		{
+			get
+			{
+				return q => q.Text("Logout").Index(1);
+			}
+		}
+
+		public QQ FollowArtistButton(string name)
+		{
+			return q => q.Marked("follow_textview_artist_name").Text(name).Index(0).Parent().Parent().Child().Marked("follow_button_follow").Index(0);
 		}
 	}
 }
